@@ -21,8 +21,16 @@ HoloYi 台股預測研究專案的**前瞻預測帳本錨點**。本儲存庫只
 3. 重算每筆的內容雜湊與鏈，確認帳本內部一致（專案的 `npm run verify` 已做這件事）。
 4. 查 GitHub 上對應 commit 的**推送時間**（不是 commit 自述的時間，後者可由作者本機任意設定）。
 
+## OpenTimestamps（獨立的長期證明）
+
+`ots/anchors-NNNNN.jsonl.ots` 是 [OpenTimestamps](https://opentimestamps.org) 證明：`anchors.jsonl` **前 NNNNN 行**的 SHA-256 經公開日曆伺服器匯集後寫入比特幣區塊。這一層不依賴 GitHub 或任何公司，也不受 GitHub 事件保留期限影響。
+
+- 剛蓋章的證明是「等待中」（PendingAttestation），通常數小時內由排程升級為「已入區塊」（BitcoinBlockHeaderAttestation，附區塊高度）。
+- 驗證：`head -n NNNNN anchors.jsonl > anchors-NNNNN.jsonl`，再用 `ots verify anchors-NNNNN.jsonl.ots`（需要比特幣節點），或把兩個檔案拖進 [opentimestamps.org](https://opentimestamps.org) 的網頁驗證。
+- 較新的證明涵蓋之前所有行（檔案只增不改），所以排程每個台北日期最多蓋一次章。
+
 ## 限制（誠實聲明）
 
 - 錨點只證明「這個鏈尾在推送時已存在」。它不證明預測有預測力，也不證明帳本內容是對的。
-- 推送時間以 GitHub 為準，信任 GitHub；GitHub 事件 API 只保留較近期的紀錄，長期證明建議另用 OpenTimestamps 之類的獨立時間戳。
+- GitHub 推送時間信任 GitHub，且事件 API 只保留較近期的紀錄；長期證明靠上面的 OpenTimestamps（比特幣）。
 - 若某天漏推，之後補推的錨點只能證明「補推時」之前就存在。
